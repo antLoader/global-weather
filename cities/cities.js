@@ -3,10 +3,9 @@ let path = './citylist/city.list.json';
 
 let readList = (path) => JSON.parse(fs.readFileSync(path, 'utf8'));
 
-let searchIdByName = async (name) => {
+let searchIdByName = async (id) => {
     let list = readList(path);
-    let city = list.find(list => list.name === name);
-    return city.id;
+    return list.filter(list => list.id === id);
 }
 
 module.exports = {
