@@ -20,7 +20,7 @@ const opts = {
 const argv = require('yargs')
     .command(
         '$0', 
-        'Consultar el estado climatologico en una localidad determinadqa', 
+        'Consultar el estado climatologico en una localidad determinada', 
         opts,
         // argv => {
         //     argv.ciudad = encodeURI(argv.ciudad);
