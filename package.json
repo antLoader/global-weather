@@ -12,6 +12,8 @@
     "axios": "^0.21.0",
     "chalk": "^4.1.0",
     "node-geocoder": "^3.27.0",
+    "translate": "^1.1.2",
+    "translate-google": "^1.4.3",
     "yargs": "^16.1.0"
   }
 }
