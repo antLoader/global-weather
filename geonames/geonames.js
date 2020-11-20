@@ -23,40 +23,17 @@ const geonamesProps = [
     'modificationdate'
 ]
 
-
-const readGeonames = async path => {
+const geonameSearch = async (name, path) => {
     let delimiter = '\t';
     let data = [];
     let lineObj = {};
     const fileStream = fs.createReadStream(path);
     const rl = readline.createInterface({
         input: fileStream,
-        crlfDelay: Infinity  //recognize all instances of CR LF ('\r\n') in input.txt as a single line break.
+        crlfDelay: Infinity
     });
     
-    for await (const line of rl) {   //sin el await peta
-        let lineAry = line.split(delimiter);
-        for (let x=0; x < lineAry.length; x++) {
-            lineObj[`${geonamesProps[x]}`] = lineAry[x];
-        }
-        data.push(lineObj);
-        lineObj = {};
-    }
-    console.log(data);
-    return data;
-}
-
-const geonameSearchByName = async (name, path) => {
-    let delimiter = '\t';
-    let data = [];
-    let lineObj = {};
-    const fileStream = fs.createReadStream(path);
-    const rl = readline.createInterface({
-        input: fileStream,
-        crlfDelay: Infinity  //recognize all instances of CR LF ('\r\n') in input.txt as a single line break.
-    });
-    
-    for await (const line of rl) {   //sin el await peta
+    for await (const line of rl) {
         let lineAry = line.split(delimiter);
         for (let x=0; x < lineAry.length; x++) {
             lineObj[`${geonamesProps[x]}`] = lineAry[x];
@@ -69,12 +46,10 @@ const geonameSearchByName = async (name, path) => {
         lineObj = {};
     }
 
-    console.log(data);
     return data;
 }
 
 
 module.exports = { 
-    readGeonames,
-    geonameSearchByName
+    geonameSearch
 }

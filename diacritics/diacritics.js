@@ -86,9 +86,10 @@ let defaultDiacriticsRemovalMap = [
 ];
 
 function removeDiacritics(str) {
-    ddrm = defaultDiacriticsRemovalMap;
-    for (let i = 0; i < ddrm.length; i++) {
-        str = str.replace(ddrm[i].letters, ddrm[i].base);
+    let ddrm = defaultDiacriticsRemovalMap;
+    let ddrm_l = defaultDiacriticsRemovalMap.length;
+    for (let x = 0; x < ddrm_l; x++) {
+        str = str.replace(ddrm[x].letters, ddrm[x].base);
     }
     return str;
 }
