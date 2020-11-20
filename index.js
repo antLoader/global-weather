@@ -16,13 +16,16 @@ const {
 } = require('./diacritics/diacritics');
 
 const {
-    readList
+    readGeonames,
+    geonameSearchByName
 } = require('./geonames/geonames');
 
 const chalk = require('chalk');
 const argv = require('./config/yargs.js').argv;
 const util = require('util');
 
+
+const cities500path = './citylist/cities500.txt';
 let express = require('express');
 let app = express();
 
@@ -39,14 +42,17 @@ let app = express();
 
 
 let getAll = async argv => {
+    //BUSCAR EN LA LISTA citylist
     let cities = searchByName(argv.ciudad);
+    //Meter las coordenadas y la id de las localidades con ese nombre en coords[]
     let coords = [];
     for (let c of cities) coords.push({
         id: c.id,
         lat: parseFloat(c.coord.lat),
         lng: parseFloat(c.coord.lon)
     });
-
+    //
+    let cities500 = await readGeonames(cities500path);
     let boundings = [];
     let coincidences = [];
 
@@ -75,15 +81,9 @@ let getAll = async argv => {
                 });
             }
         }
+        //console.log(coincidences[0].weather.w);
+       
     }
-    // for(let x of coincidences){
-    //     console.log('geolocation:', x.geolocation.l);
-    //     console.log('weather:', x.weather.w);
-    //     console.log('cities:', x.citylist.c);
-    // }
-    // console.log('geolocation:', coincidences[0].geolocation.l);
-    // console.log('weather:', coincidences[0].weather.w);
-    // console.log('cities:', coincidences[0].citylist.c);
     datos = [];
     for(let x of coincidences){
         let location = x.geolocation.l;
@@ -91,6 +91,7 @@ let getAll = async argv => {
         let city = x.citylist.c;
         datos.push({
             name: location.display_name,
+            name2: city.name,
             description: weather.weather[0].description,
             temp: weather.main.temp,
             feels_like: weather.main.feels_like,
@@ -104,22 +105,50 @@ let getAll = async argv => {
             sunrise: weather.sys.sunrise,
             sunset: weather.sys.sunset,
             timezone: weather.timezone,
-            country: city.country
+            country: city.country,
+            id: city.id   //citylist.id == geonames.id
         })
     }
+    for(let x of cities500){
+        for (let d of datos){
+            if((x.name == d.name2 || x.alternatenames.includes(d.name2)) && (x.countrycode == d.country)){
+                datos.push(x);
+            }
+        }
+    }
 
-    console.log(datos);
-    app.get('/hello', function(req, res){
-        let response = [];
-        response.push(datos);
-        response.push('Hola Expess');
-        res.send(response);
-    });
-    app.listen(3000);
+
+    let removeDuplicates = (ary) => {
+        let datos_s = new Set();
+        for (let x of ary) datos_s.add(x)
+        let datos_a = Array.from(datos_s);
+        return datos_a; 
+    }
+
+    
+
+
+    console.log(removeDuplicates(datos));
+    //console.log(chalk.red.bold('DATOS!!!!!'));
+    //console.log(datos);
+    // let cities500 = await readGeonames(cities500path);
+    // for (let k of cities500){
+
+    // }
+    // console.log(cities500);
+    // app.get('/', function(req, res){
+    //     let response = [];
+    //     let remDup = removeDuplicates(datos);
+
+    //     response.push(remDup);
+    //     // response.push(cities500);
+    //     res.send(response);
+    // });
+    // app.listen(3000);
     //console.log(cities);
     //console.log(searchById(2519237));
 }
 
-//console.log(readList('./citylist/cities500.txt'));
+// getAll(argv);
 
-getAll(argv);
+geonameSearchByName('Cordoba', cities500path);
