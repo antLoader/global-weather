@@ -1,3 +1,5 @@
+const { removeDiacritics } = require('.././diacritics/diacritics.js'); 
+
 const ciudad = {
     demand: true,
     alias: 'c',
@@ -5,16 +7,8 @@ const ciudad = {
     desc: 'Ciudad'
 }
 
-const pais = {
-    alias: 'p',
-    type: 'string',
-    default: false,
-    desc: 'Pais al que la ciudad pertenece'
-}
-
 const opts = {
-    ciudad,
-    pais
+    ciudad
 }
 
 const argv = require('yargs')
@@ -22,10 +16,7 @@ const argv = require('yargs')
         '$0', 
         'Consultar el estado climatologico en una localidad determinada', 
         opts,
-        // argv => {
-        //     argv.ciudad = encodeURI(argv.ciudad);
-        //     argv.pais = argv.pais ? encodeURI(argv.pais) : false;
-        // }
+        argv => argv.ciudad = removeDiacritics(argv.ciudad)
     )
     .help()
     .argv;

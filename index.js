@@ -1,32 +1,12 @@
-const {
-    getLocationInfo
-} = require('./geolocation/geolocation');
-
-const {
-    getWeather
-} = require('./weather/weather');
-
-const {
-    searchByName,
-    searchById
-} = require('./cities/cities');
-
-const {
-    removeDiacritics
-} = require('./diacritics/diacritics');
-
-const {
-    geonameSearch
-} = require('./geonames/geonames');
+const { getLocationInfo } = require('./geolocation/geolocation');
+const { getWeather } = require('./weather/weather');
+const { searchByName, searchById, searchByGeonameIds } = require('./cities/cities');
+const { altNamesSearch } = require('./geonames/geonames');
+const { countryNames } = require('./codes/countrycodes.js');
 
 const chalk = require('chalk');
 const argv = require('./config/yargs.js').argv;
 const util = require('util');
-
-
-const geoPath = './geonames/geonames.txt';
-
-//const cityPath = './citylist/cities500.txt';
 let express = require('express');
 let app = express();
 
@@ -48,14 +28,21 @@ let app = express();
     }
 */
 
-
-let getGeonames = geonameSearch(argv.ciudad, geoPath);
-
-let log = async () => {
-    let log = await getGeonames;
-    console.log(log);
+let searchHandler = async (city = argv.ciudad) => {
+    let geonames = await altNamesSearch(city);
+    let cities = await searchByGeonameIds(geonames);
+    let codes = await countryNames('AR');
+    // console.log('GEONAMES\n');
+    //console.log(geonames);
+    // console.log('CITIES\n');
+    console.log(cities);
+    // console.log('CODES\n');
+    // console.log(codes);
 }
-log();
+
+searchHandler();
+
+
 
 
 // let getAll = async argv => {
@@ -63,7 +50,7 @@ log();
 //     //BUSCAR EN LA LISTA citylist
 //     //let cities = searchByName(argv.ciudad);
 //     let cities = searchByName('Sopuerta'); //=> array de objetos
-    
+
 //     let v = "0";
 //     //Meter las coordenadas y la id de las localidades con ese nombre en coords[]
 //     let coords = [];
@@ -103,7 +90,7 @@ log();
 //             }
 //         }
 //         //console.log(coincidences[0].weather.w);
-       
+
 //     }
 //     datos = [];
 //     for(let x of coincidences){
@@ -146,7 +133,7 @@ log();
 //         return datos_a; 
 //     }
 
-    
+
 
 
 //     console.log(removeDuplicates(datos));
