@@ -23,12 +23,19 @@ const geoProps = [
     'modificationdate'
 ];
 
-const altNamesSearch = async (name) => {
+const altNamesSearch = async name => {
     name = await name.toLowerCase();
     let data = [];
     let geonames = await readTxt(geoPath, geoProps);
     for (let x of geonames) if ((x.name).toLowerCase().includes(name) || (x.alternatenames).toLowerCase().includes(name)) data.push(x);
     return data;
+}
+
+const geonameIdSearch = async id => {
+    let geonames = await readTxt(geoPath, geoProps);
+    for (let x of geonames){
+        if(x.geonameid == id) return x;
+    }
 }
 
 // for await (const line of rl) {
@@ -51,5 +58,6 @@ const altNamesSearch = async (name) => {
 
 
 module.exports = {
-    altNamesSearch
+    altNamesSearch,
+    geonameIdSearch
 }

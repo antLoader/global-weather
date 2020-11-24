@@ -1,14 +1,20 @@
 const { getLocationInfo } = require('./geolocation/geolocation');
 const { getWeather } = require('./weather/weather');
 const { searchByName, searchById, searchByGeonameIds } = require('./cities/cities');
-const { altNamesSearch } = require('./geonames/geonames');
-const { countryNames } = require('./codes/countrycodes.js');
+const { altNamesSearch, geonameIdSearch } = require('./geonames/geonames');
+const { countryName, countryNames } = require('./codes/countrycodes.js');
+const i18n_countries = require("i18n-iso-countries");
 
 const chalk = require('chalk');
 const argv = require('./config/yargs.js').argv;
 const util = require('util');
 let express = require('express');
 let app = express();
+
+
+//SEARCH RESULT VARIABLES
+let boxResult = [];
+let weatherResult = [];
 
 
 /*
@@ -28,14 +34,54 @@ let app = express();
     }
 */
 
+
+
+let populateSearchBox = async (city = argv.ciudad) => {
+
+};
+
+
 let searchHandler = async (city = argv.ciudad) => {
+    
+    let countries = [];
+    let nonTrivialGeonames = [];
+
+    //object array
     let geonames = await altNamesSearch(city);
+
+    //object array
     let cities = await searchByGeonameIds(geonames);
-    let codes = await countryNames('AR');
+
+    for (let c of cities) {
+        countries.push(c.country);
+        nonTrivialGeonames.push(await geonameIdSearch(c.id));
+    }
+
+    let codes = await countryNames(countries);
+    console.log(i18n_countries.getName("US", "de", {select: "official"}));
+    let allData = [];
+    for (let [x, y] of cities.entries()) {
+        allData[x] = [];
+        allData[x].push((codes[x]));
+        allData[x].push(y);
+        allData[x].push(nonTrivialGeonames[x]);
+        let w = await getWeather(allData[x][1].id);
+        allData[x].push(w.data);
+    }
+    for (let x of allData) {
+        console.log(chalk.bgBlack.white.dim('DATA START'));
+        console.log(x);
+        console.log(chalk.bgCyan.dim('DATA END'));
+    }
+
+    //console.log(allData[0][4].weather);
     // console.log('GEONAMES\n');
     //console.log(geonames);
     // console.log('CITIES\n');
-    console.log(cities);
+    // for (let c of cities){
+    //     console.log('ELEMENT' + c); 
+    // }
+    //console.log(cities);
     // console.log('CODES\n');
     // console.log(codes);
 }

@@ -9,9 +9,11 @@ const searchById = id => readList().filter(list => list.id === id);
 
 const searchByGeonameIds = async ids => {
     let cities = [];
-    for (let x of ids) cities.push(searchById(parseInt(x.geonameid)));
+    for (let x of ids){
+        let city = searchById(parseInt(x.geonameid));
+        city.length > 0 ? cities.push(city[0]) : null;
+    } 
     return cities;
 }
-
 
 module.exports = { searchByName, searchById, searchByGeonameIds }
