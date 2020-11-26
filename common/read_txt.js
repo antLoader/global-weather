@@ -18,6 +18,7 @@ const readTxt = async (path, props, delimiter = '\t') => {
     return objAry;
 };
 
+
 module.exports = {
     readTxt
 }

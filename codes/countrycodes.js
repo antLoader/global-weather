@@ -8,12 +8,12 @@ const codeProps = [
     'alfa3'
 ];
 
-const countryName = async (alfa2) => {
+const cnt_countryName = async (alfa2) => {
     let codes = await readTxt(codePath, codeProps);
     for (let x of codes) if (x.alfa2.includes(alfa2)) return x.name;
 }
 
-const countryNames = async (alfa2) => {
+const cnt_countryNames = async (alfa2) => {
     let codes = await readTxt(codePath, codeProps);
     let data = [];
     for (let a of alfa2) for (let x of codes) if (x.alfa2.includes(a)) data.push(x.name);
@@ -21,7 +21,7 @@ const countryNames = async (alfa2) => {
 }
 
 module.exports = {
-    countryName,
-    countryNames
+    cnt_countryName,
+    cnt_countryNames
 }
 

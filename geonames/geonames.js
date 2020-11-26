@@ -1,63 +1,47 @@
 const { readTxt } = require('.././common/read_txt.js')
 const geoPath = './assets/geonames.txt';
-
 const geoProps = [
-    'geonameid',
-    'name',
-    'asciiname',
-    'alternatenames',
-    'latitude',
-    'longitude',
-    'featureclass',
-    'featurecode',
-    'countrycode',
-    'cc2',
-    'admin1code',
-    'admin2code',
-    'admin3code',
-    'admin4code',
-    'population',
-    'elevation',
-    'dem',
-    'timezone',
-    'modificationdate'
+    'geonameid', 'name', 'asciiname', 'alternatenames', 'latitude',
+    'longitude', 'featureclass', 'featurecode', 'countrycode', 'cc2', 'admin1code',
+    'admin2code', 'admin3code', 'admin4code', 'population', 'elevation', 'dem',
+    'timezone', 'modificationdate'
 ];
 
-const altNamesSearch = async name => {
+const geo_altNamesSearch = async name => {
     name = await name.toLowerCase();
-    let data = [];
+    let data = new Set();
     let geonames = await readTxt(geoPath, geoProps);
-    for (let x of geonames) if ((x.name).toLowerCase().includes(name) || (x.alternatenames).toLowerCase().includes(name)) data.push(x);
-    return data;
+    
+    for (let x of geonames) {
+        let names = x.name.split(" ");
+        breakme: {
+            for(let n of names){
+                if((n).toLowerCase().includes(name) && n.length == name.length){
+                    data.add(x);
+                    break breakme;
+                }
+            }
+            let altNames = x.alternatenames.split(",");
+            for (let m of altNames){
+                let namesAry = m.split(" ");
+                for (let a of namesAry){
+                    if((a).toLowerCase().includes(name) && a.length == name.length){
+                        data.add(x);
+                        break breakme;
+                    }
+                }
+            }
+        }
+    } 
+    return Array.from(data);
 }
 
-const geonameIdSearch = async id => {
+const geo_idSearch = async id => {
     let geonames = await readTxt(geoPath, geoProps);
-    for (let x of geonames){
-        if(x.geonameid == id) return x;
-    }
+    for (let x of geonames) if (x.geonameid == id) return x;
 }
-
-// for await (const line of rl) {
-//     let lineAry = line.split(delimiter);
-//     let lineLength = lineAry.length;
-//     for (let x = 0; x < lineLength; x++) {
-//         lineObj[`${geonamesProps[x]}`] = lineAry[x];
-//     }
-//     let altNames = lineObj.alternatenames.split(',');
-//     for (n of altNames) {  //inserta el mismo registro varias veces si alternate names contiene mas de una ocurrencia, por eso el break
-//         if (lineObj.name == name || n == name) {
-//             data.push(lineObj);
-//             break;
-//         }
-//     }
-//     lineObj = {};
-// }
-// return data;
-// }
-
 
 module.exports = {
-    altNamesSearch,
-    geonameIdSearch
+    geo_altNamesSearch,
+    geo_idSearch
 }
