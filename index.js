@@ -1,29 +1,36 @@
-const { commonSearch } = require ('./searches/searches.js');
+const { src_commonSearch } = require('./searches/searches.js');
+const { flg_getFlag } = require('./flags/flags.js');
 
 const chalk = require('chalk');
 const argv = require('./config/yargs.js').argv;
 let express = require('express');
+const { flg_getFlags } = require('./flags/flags.js');
 let app = express();
+app.set('view engine', 'pug');
+app.set('views','./views');
 
-
-let searchBox = {
+let searchResultBox = {
     name: '',
-    country:'',
-    
+    country: '',
+
 
 }
 
+let populateSearchObject = async data => {
+    let searchObject = [];
 
-
-let populateSearchBox = async (city = argv.location) => {
-
+    searchObject.push({
+        name: data[1].name,
+        country: data[0],
+        
+    })
 };
 
 
 let searchHandler = async (city = argv.location) => {
-    
-    let data = await commonSearch(city);
-    console.log(data);
+
+    let data = await src_commonSearch(city);
+    return data;
 
     //     let w = await getWeather(allData[x][1].id);
     //     allData[x].push(w.data);
@@ -46,7 +53,37 @@ let searchHandler = async (city = argv.location) => {
     // console.log(codes);
 }
 
-searchHandler();
+
+let renderHandler = async () => {
+    let data = await searchHandler();
+    console.log(data);
+    let dataString = '';
+    for(let d of data){
+        dataString += d;
+        dataString += d[1].id;
+        dataString += d[2];
+    }
+    console.log(data[0][1].country);
+    app.get('/', async function (req, res) {
+        res.render('home', {
+            data: dataString,
+            flag: flg_getFlag(data[0][1].country)
+        });
+        // let response = [];
+        // let data = await searchHandler();
+
+        // response.push(data);
+        // // response.push(cities500);
+        // res.send(response);
+    });
+    app.listen(3000);
+}
+
+renderHandler();
+
+
+
+
 
 // let getAll = async argv => {
 

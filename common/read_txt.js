@@ -1,7 +1,7 @@
 const fs = require('fs');
 const readline = require('readline');
 
-const readTxt = async (path, props, delimiter = '\t') => {
+const cmn_readTxt = async (path, props, delimiter = '\t') => {
     let objAry = [];
     let lineObj = {};
     const fileStream = fs.createReadStream(path);
@@ -20,5 +20,5 @@ const readTxt = async (path, props, delimiter = '\t') => {
 
 
 module.exports = {
-    readTxt
+    cmn_readTxt
 }

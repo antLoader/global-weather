@@ -1,4 +1,4 @@
-const { readTxt } = require('.././common/read_txt.js')
+const { cmn_readTxt } = require('.././common/read_txt.js')
 const geoPath = './assets/geonames.txt';
 const geoProps = [
     'geonameid', 'name', 'asciiname', 'alternatenames', 'latitude',
@@ -10,7 +10,7 @@ const geoProps = [
 const geo_altNamesSearch = async name => {
     name = await name.toLowerCase();
     let data = new Set();
-    let geonames = await readTxt(geoPath, geoProps);
+    let geonames = await cmn_readTxt(geoPath, geoProps);
     
     for (let x of geonames) {
         let names = x.name.split(" ");
@@ -37,7 +37,7 @@ const geo_altNamesSearch = async name => {
 }
 
 const geo_idSearch = async id => {
-    let geonames = await readTxt(geoPath, geoProps);
+    let geonames = await cmn_readTxt(geoPath, geoProps);
     for (let x of geonames) if (x.geonameid == id) return x;
 }
 
