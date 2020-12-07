@@ -7,6 +7,8 @@ const geoProps = [
     'timezone', 'modificationdate'
 ];
 
+//search all occurrences of location name in name and alternateNames fields
+//returns: array of objects
 const geo_altNamesSearch = async name => {
     name = await name.toLowerCase();
     let data = new Set();
@@ -14,6 +16,7 @@ const geo_altNamesSearch = async name => {
     
     for (let x of geonames) {
         let names = x.name.split(" ");
+        //exit current location if found
         breakme: {
             for(let n of names){
                 if((n).toLowerCase().includes(name) && n.length == name.length){
@@ -32,10 +35,11 @@ const geo_altNamesSearch = async name => {
                 }
             }
         }
-    } 
+    }
     return Array.from(data);
 }
 
+//search 
 const geo_idSearch = async id => {
     let geonames = await cmn_readTxt(geoPath, geoProps);
     for (let x of geonames) if (x.geonameid == id) return x;

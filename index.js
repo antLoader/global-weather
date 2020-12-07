@@ -54,29 +54,32 @@ let searchHandler = async (city = argv.location) => {
 }
 
 
+
 let renderHandler = async () => {
     let data = await searchHandler();
     console.log(data);
-    let dataString = '';
-    for(let d of data){
-        dataString += d;
-        dataString += d[1].id;
-        dataString += d[2];
-    }
-    console.log(data[0][1].country);
-    app.get('/', async function (req, res) {
-        res.render('home', {
-            data: dataString,
-            flag: flg_getFlag(data[0][1].country)
-        });
-        // let response = [];
-        // let data = await searchHandler();
+    // let dataString = '';
+    // for(let d of data){
+    //     for (let _d in d){
+    //         dataString += _d;
+    //     }
+    //     dataString += d;
+    //     dataString += d[1].id;
+    //     dataString += d[2];
+    // }
+    // app.get('/', async function (req, res) {
+    //     res.render('home', {
+    //         data: dataString,
+    //         flag: flg_getFlag(data[0][1].country)
+    //     });
+    //     let response = [];
+    //     let data = await searchHandler();
 
-        // response.push(data);
-        // // response.push(cities500);
-        // res.send(response);
-    });
-    app.listen(3000);
+    //     response.push(data);
+    //     // response.push(cities500);
+    //     res.send(response);
+    // });
+    // app.listen(3000);
 }
 
 renderHandler();
