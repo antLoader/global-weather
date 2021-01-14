@@ -4,7 +4,6 @@ const { flg_getFlag } = require('./flags/flags.js');
 const chalk = require('chalk');
 const argv = require('./config/yargs.js').argv;
 let express = require('express');
-const { flg_getFlags } = require('./flags/flags.js');
 let app = express();
 app.set('view engine', 'pug');
 app.set('views','./views');
@@ -12,8 +11,6 @@ app.set('views','./views');
 let searchResultBox = {
     name: '',
     country: '',
-
-
 }
 
 let populateSearchObject = async data => {
@@ -26,11 +23,34 @@ let populateSearchObject = async data => {
     })
 };
 
+let searchHandler = async (city = argv.location) => await src_commonSearch(city);
 
-let searchHandler = async (city = argv.location) => {
 
-    let data = await src_commonSearch(city);
-    return data;
+let renderHandler = async () => {
+    let data = await searchHandler();
+    console.log(data);
+    app.get('/', async function (req, res) {
+        res.render('home', {
+            data: data,
+            flag: 'url(./assets/imgs/flags/PH.svg)'
+        });
+    });
+    app.listen(3000);
+}
+
+renderHandler();
+
+
+
+    // let dataString = '';
+    // for(let d of data){
+    //     for (let _d in d){
+    //         dataString += _d;
+    //     }
+    //     dataString += d;
+    //     dataString += d[1].id;
+    //     dataString += d[2];
+    // }
 
     //     let w = await getWeather(allData[x][1].id);
     //     allData[x].push(w.data);
@@ -51,40 +71,13 @@ let searchHandler = async (city = argv.location) => {
     //console.log(cities);
     // console.log('CODES\n');
     // console.log(codes);
-}
 
-
-
-let renderHandler = async () => {
-    let data = await searchHandler();
-    console.log(data);
-    // let dataString = '';
-    // for(let d of data){
-    //     for (let _d in d){
-    //         dataString += _d;
-    //     }
-    //     dataString += d;
-    //     dataString += d[1].id;
-    //     dataString += d[2];
-    // }
-    // app.get('/', async function (req, res) {
-    //     res.render('home', {
-    //         data: dataString,
-    //         flag: flg_getFlag(data[0][1].country)
-    //     });
     //     let response = [];
     //     let data = await searchHandler();
 
     //     response.push(data);
     //     // response.push(cities500);
     //     res.send(response);
-    // });
-    // app.listen(3000);
-}
-
-renderHandler();
-
-
 
 
 

@@ -16,7 +16,7 @@ const cnt_countryName = async (alfa2) => {
 const cnt_countryNames = async (alfa2) => {
     let codes = await cmn_readTxt(codePath, codeProps);
     let data = [];
-    for (let a of alfa2) for (let x of codes) if (x.alfa2.includes(a)) data.push(x.name);
+    for (let a of alfa2) for (let x of codes) if (x.alfa2.includes(a)) data.push(x.name.substring(0, x.name.length - 1));
     return data;
 }
 

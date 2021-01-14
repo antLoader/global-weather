@@ -1,9 +1,10 @@
 const { cty_searchByGeoIds } = require('.././cities/cities');
 const { geo_altNamesSearch, geo_idSearch } = require('.././geonames/geonames');
 const { cnt_countryNames } = require('.././codes/countrycodes.js');
-const { loc_getLocationInfo } = require('.././geolocation/geolocation.js');
+const { loc_getLocationInfo, loc_searchByCityCoordinates } = require('.././geolocation/geolocation.js');
 const i18n_countries = require("i18n-iso-countries");
 const geolocation = require('.././geolocation/geolocation.js');
+const { flg_getFlag } = require('.././flags/flags');
 
 
 /*
@@ -14,58 +15,45 @@ const geolocation = require('.././geolocation/geolocation.js');
     1- Get location name from user
     2- Search location in geonames (returns array of objects) -> Add results to geonames array
     3- Search geonames results in city list (returns array of objects) -> Add results to cities array
-    4- 
-        4.1- Add country codes of cities returned by city search to countries array
-        4.2- Search in geonames only ids returned by city search -> Add results to nonTrivialGeonames array
-        4.3- Add location coordinates to coords array
+    4- Get location info from geolocation (returns array of objects) (use .data) -> Add results to geolocationInfo array
+    5- 
+        5.1- Add country codes of cities in cities array to countries array
+        5.2- Search in geonames array only ids in cities array -> Add results to nt_geonames array
+        5.3- Search for elements on geolocationInfo array whose coordinates boundingbox includes coordinates of a localization in cities array
+                -> Add results to nt_geolocationInfo array
 
-    5- Get location info from geolocation (returns array of objects) (use .data)
     6- Search country names using codes stored in countries array -> Add results to codes array
     7- Populate data array
         7.1- [name from codes array],
         7.2- [city object from cities array],
-        7.3- [geonames object from nonTrivialGeonames array]
-
-        TODO
-        ----
-        7.4- [geolocation object from geolocationInfo array] -> search coords in bounding box
+        7.3- [geonames object from nt_geonames array]
+        7.4- [geolocation object from nt_geolocationInfo array]
 
 */
 
-
-
 let src_commonSearch = async (location) => {
-    let countries = [], nonTrivialGeonames = [], data = [], coords = [], nonTrivialGeolocation = [];
-    let geonames = await geo_altNamesSearch(location);
-    let cities = await cty_searchByGeoIds(geonames);
+    let countries = [], nt_geonames = [], data = [], nt_geolocationInfo = [];
+    let geonames = await geo_altNamesSearch(location);          
+    let cities = await cty_searchByGeoIds(geonames);            
     let geolocationInfo = await loc_getLocationInfo(location);
     for (let c of cities) {
-        countries.push(c.country);
-        nonTrivialGeonames.push(await geo_idSearch(c.id));
-        breakme: {
-            for (let l of geolocationInfo.data) {
-                let latMin = parseFloat(l.boundingbox[0]);
-                let latMax = parseFloat(l.boundingbox[1]);
-                let lngMin = parseFloat(l.boundingbox[2]);
-                let lngMax = parseFloat(l.boundingbox[3]);
-                if ((c.coord.lat > latMin && c.coord.lat < latMax) && (c.coord.lon > lngMin && c.coord.lon < lngMax)) {
-                    nonTrivialGeolocation.push(l);
-                    break breakme;
-                }
-            }
-            nonTrivialGeolocation.push({ boundingbox: "SIN COINCIDENCIA" });
-        }
+        countries.push(c.country);                              
+        nt_geonames.push(await geo_idSearch(c.id));      
+        nt_geolocationInfo.push(loc_searchByCityCoordinates(c, geolocationInfo));  
     }
 
-    let codes = await cnt_countryNames(countries);
+    let codes = await cnt_countryNames(countries);            
     for (let [x, y] of cities.entries()) {
         data[x] = [];
-        data[x].push((codes[x]));
-        data[x].push(y);
-        data[x].push(y.coord);
-        data[x].push(nonTrivialGeonames[x]);
-        data[x].push(nonTrivialGeolocation[x]);
-        data[x].push(nonTrivialGeolocation[x].boundingbox);
+        data[x].push(
+            codes[x],                                           
+            y,                                                  
+            y.coord,                                            
+            nt_geonames[x],                              
+            nt_geolocationInfo[x], 
+            nt_geolocationInfo[x].boundingbox, 
+            `${flg_getFlag(y.country)}`
+        );
     }
     return data;
 }
