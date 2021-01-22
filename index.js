@@ -27,12 +27,16 @@ let searchHandler = async (city = argv.location) => await src_commonSearch(city)
 
 
 let renderHandler = async () => {
+    //app.use('/static', express.static('assets'));
+    app.use('/static', express.static(__dirname + '/assets'));
     let data = await searchHandler();
-    console.log(data);
+    for(let x = 0; x < data.length; x++){
+        console.log(data[x]);
+        console.log(chalk.blueBright(`\n\n---${x}-------------------------------------------------------\n\n`));
+    }
     app.get('/', async function (req, res) {
         res.render('home', {
-            data: data,
-            flag: 'url(./assets/imgs/flags/PH.svg)'
+            data: data
         });
     });
     app.listen(3000);
@@ -50,15 +54,6 @@ renderHandler();
     //     dataString += d;
     //     dataString += d[1].id;
     //     dataString += d[2];
-    // }
-
-    //     let w = await getWeather(allData[x][1].id);
-    //     allData[x].push(w.data);
-    // }
-    // for (let x of allData) {
-    //     console.log(chalk.bgBlack.white.dim('DATA START'));
-    //     console.log(x);
-    //     console.log(chalk.bgCyan.dim('DATA END'));
     // }
 
     //console.log(allData[0][4].weather);

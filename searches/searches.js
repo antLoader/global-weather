@@ -5,6 +5,7 @@ const { loc_getLocationInfo, loc_searchByCityCoordinates } = require('.././geolo
 const i18n_countries = require("i18n-iso-countries");
 const geolocation = require('.././geolocation/geolocation.js');
 const { flg_getFlag } = require('.././flags/flags');
+const { wt_getWeather } = require('../weather/weather');
 
 
 /*
@@ -32,14 +33,18 @@ const { flg_getFlag } = require('.././flags/flags');
 */
 
 let src_commonSearch = async (location) => {
-    let countries = [], nt_geonames = [], data = [], nt_geolocationInfo = [];
+    let countries = [], nt_geonames = [], data = [], nt_geolocationInfo = [], weather = [];
     let geonames = await geo_altNamesSearch(location);          
     let cities = await cty_searchByGeoIds(geonames);            
     let geolocationInfo = await loc_getLocationInfo(location);
+
     for (let c of cities) {
         countries.push(c.country);                              
         nt_geonames.push(await geo_idSearch(c.id));      
-        nt_geolocationInfo.push(loc_searchByCityCoordinates(c, geolocationInfo));  
+        nt_geolocationInfo.push(loc_searchByCityCoordinates(c, geolocationInfo));
+        console.log(nt_geolocationInfo[0].place_id);
+        weather.push(await wt_getWeather(c.id));
+        console.log(weather[0]);
     }
 
     let codes = await cnt_countryNames(countries);            
@@ -52,7 +57,8 @@ let src_commonSearch = async (location) => {
             nt_geonames[x],                              
             nt_geolocationInfo[x], 
             nt_geolocationInfo[x].boundingbox, 
-            `${flg_getFlag(y.country)}`
+            `${flg_getFlag(y.country)}`,
+            weather[x]
         );
     }
     return data;
@@ -62,3 +68,12 @@ module.exports = {
     src_commonSearch
 }
 
+
+    //     let w = await getWeather(allData[x][1].id);
+    //     allData[x].push(w.data);
+    // }
+    // for (let x of allData) {
+    //     console.log(chalk.bgBlack.white.dim('DATA START'));
+    //     console.log(x);
+    //     console.log(chalk.bgCyan.dim('DATA END'));
+    // }

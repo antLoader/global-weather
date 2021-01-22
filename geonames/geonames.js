@@ -7,6 +7,7 @@ const geoProps = [
     'timezone', 'modificationdate'
 ];
 
+
 //search all occurrences of location name in name and alternateNames fields
 //returns: array of objects
 const geo_altNamesSearch = async name => {
